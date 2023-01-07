@@ -1,4 +1,4 @@
-<script>
+<script lang="js">
 import { defineComponent } from "vue";
 import { ElNotification } from "element-plus";
 

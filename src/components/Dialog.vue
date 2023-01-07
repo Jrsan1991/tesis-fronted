@@ -2,24 +2,22 @@
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "Modal",
+  name: "Dialog",
   props: {
     title: String,
-    formData: Object,
+    message: String,
   },
 });
 </script>
 
 <template>
   <el-dialog :title="title">
-    <el-form :model="formData">
-      <slot name="body" v-bind="formData"></slot>
-    </el-form>
+    <span>{{ message }}</span>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="$emit('modalCancel')">Cancelar</el-button>
-        <el-button type="primary" @click="$emit('modalConfirm')">
-          Guardar
+        <el-button @click="$emit('dialogCancel')">Cancelar</el-button>
+        <el-button type="primary" @click="$emit('dialogConfirm')">
+          Aceptar
         </el-button>
       </span>
     </template>

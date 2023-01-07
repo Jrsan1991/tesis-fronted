@@ -3,11 +3,9 @@ import { ref, computed } from "vue";
 import { useStorage } from "@vueuse/core";
 import axios from "axios";
 
-const { VITE_API_URL } = import.meta.env;
-
 export const useSessionStore = defineStore("session", () => {
   const loading = ref(false);
-  const accessToken = ref(useStorage("accessToken", ""));
+  const token = ref(useStorage("token", ""));
   const user = ref(useStorage("user", {}));
 
   const login = async (credentials) => {
@@ -17,9 +15,9 @@ export const useSessionStore = defineStore("session", () => {
     };
     try {
       loading.value = true;
-      const response = await axios.post(`${VITE_API_URL}/login`, credentials);
+      const response = await axios.post("login", credentials);
       const { data } = response;
-      accessToken.value = data.token;
+      token.value = data.token;
       user.value = data.user;
     } catch (error) {
       const { response } = error;
@@ -31,5 +29,19 @@ export const useSessionStore = defineStore("session", () => {
     return result;
   };
 
-  return { loading, accessToken, user, login };
+  const logout = async () => {
+    let result = true;
+    try {
+      loading.value = true;
+      token.value = "";
+      user.value = {};
+    } catch (error) {
+      result = false;
+    } finally {
+      loading.value = false;
+    }
+    return result;
+  };
+
+  return { loading, token, user, login, logout };
 });
