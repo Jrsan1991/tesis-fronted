@@ -24,5 +24,4 @@ export default defineComponent({
   </el-dialog>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

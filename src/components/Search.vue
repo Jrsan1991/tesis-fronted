@@ -50,8 +50,8 @@ export default defineComponent({
       />
     </el-col>
     <el-col :xs="24" :sm="24" :md="4" :lg="4" align="right">
-      <el-button type="primary" @click="handleSearch"> Buscar </el-button>
-      <el-button type="warning" @click="handleClear"> Limpiar </el-button>
+      <el-button type="primary" @click="handleSearch"> <font-awesome-icon style="margin-right: 5px;" icon="fa-solid fa-search" /> Buscar </el-button>
+      <el-button type="warning" @click="handleClear"> <font-awesome-icon style="margin-right: 5px;" icon="fa-solid fa-trash" /> Limpiar </el-button>
     </el-col>
   </el-row>
 </template>

@@ -10,5 +10,4 @@ export default defineComponent({
   <p>HomeView</p>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

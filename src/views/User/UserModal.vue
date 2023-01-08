@@ -9,6 +9,7 @@ export default defineComponent({
   props: {
     id: Number,
     readOnly: Boolean,
+    screen:Object,
   },
   setup() {
     const user = useUserStore();
@@ -147,15 +148,18 @@ export default defineComponent({
     :title="readOnly ? 'Usuario' : `${id > 0 ? 'Editar' : 'Registrar'} usuario`"
     v-model="modalVisible"
     :before-close="handleClose"
+    :width="screen.dialogWidth"
   >
     <el-form
       ref="userForm"
+      v-loading="loading"
       :model="formData"
       status-icon
       :rules="rules"
-      label-width="80px"
+      label-width="120"
+      :label-position="screen.labelPosition"
     >
-      <el-form-item label="Nombre" label-width="120" prop="name">
+      <el-form-item label="Nombre" prop="name">
         <el-input
           v-model="formData.name"
           autocomplete="off"
@@ -164,7 +168,6 @@ export default defineComponent({
       </el-form-item>
       <el-form-item
         label="Contraseña"
-        label-width="120"
         prop="password"
         v-if="!readOnly"
       >
@@ -177,7 +180,6 @@ export default defineComponent({
       </el-form-item>
       <el-form-item
         label="Confirmación"
-        label-width="120"
         prop="password_confirmation"
         v-if="!readOnly"
       >
@@ -188,21 +190,21 @@ export default defineComponent({
           :disabled="readOnly || loading"
         />
       </el-form-item>
-      <el-form-item label="Cédula" label-width="120" prop="credential">
+      <el-form-item label="Cédula" prop="credential">
         <el-input
           v-model="formData.credential"
           autocomplete="off"
           :disabled="readOnly || loading"
         />
       </el-form-item>
-      <el-form-item label="Correo" label-width="120" prop="email">
+      <el-form-item label="Correo" prop="email">
         <el-input
           v-model="formData.email"
           autocomplete="off"
           :disabled="readOnly || loading"
         />
       </el-form-item>
-      <el-form-item label="Grado" label-width="120" prop="grade">
+      <el-form-item label="Grado" prop="grade">
         <el-select v-model="formData.grade" placeholder="Seleccione">
           <el-option
             v-for="(grade, key) in grades"
@@ -212,7 +214,7 @@ export default defineComponent({
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="Es visitante" label-width="120" prop="is_visit">
+      <el-form-item label="Es visitante" prop="is_visit">
         <el-switch
           v-model="formData.is_visit"
           :disabled="readOnly || loading"
@@ -220,7 +222,6 @@ export default defineComponent({
       </el-form-item>
       <el-form-item
         label="Unidad"
-        label-width="120"
         prop="visit_unity"
         v-if="formData.is_visit"
       >
@@ -249,5 +250,4 @@ export default defineComponent({
   </el-dialog>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
