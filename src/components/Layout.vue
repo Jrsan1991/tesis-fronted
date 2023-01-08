@@ -1,4 +1,4 @@
-<script lang="js">
+<script>
 import { defineComponent } from "vue";
 import Navbar from "./Navbar.vue";
 
@@ -21,7 +21,7 @@ export default defineComponent({
   </el-container>
 </template>
 
-<style>
+<style scoped>
 .bg {
   background-color: floralwhite;
 }

@@ -1,8 +1,8 @@
-<script lang="js">
+<script>
 import { defineComponent } from "vue";
 import { ElNotification } from "element-plus";
-
 import { useSessionStore } from "@/stores/session";
+import { getError } from "@/utils/helpers";
 
 export default defineComponent({
   name: "LoginView",
@@ -15,8 +15,8 @@ export default defineComponent({
   data() {
     return {
       formData: {
-        email: "",
-        password: "",
+        email: "admin@admin.com",
+        password: "admin",
       },
       rules: {
         email: [
@@ -46,7 +46,7 @@ export default defineComponent({
           if (result.error > 0) {
             ElNotification({
               title: "Error",
-              message: result.message,
+              message: getError(result.data),
               type: "error",
             });
           } else {
@@ -107,7 +107,7 @@ export default defineComponent({
   </el-row>
 </template>
 
-<style>
+<style scoped>
 .el-row {
   min-height: 100vh;
 }

@@ -22,7 +22,7 @@ export const useSessionStore = defineStore("session", () => {
     } catch (error) {
       const { response } = error;
       result.error = response.status;
-      result.message = response.data.message;
+      result.data = response.data;
     } finally {
       loading.value = false;
     }

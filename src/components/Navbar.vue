@@ -1,4 +1,4 @@
-<script lang="js">
+<script>
 import { defineComponent } from "vue";
 import { ElNotification } from "element-plus";
 
@@ -25,12 +25,12 @@ export default defineComponent({
   methods: {
     handleSelect(key, keyPath) {},
     handleLogout() {
-      this.dialogVisible = true
+      this.dialogVisible = true;
     },
     dialogCancel(value) {
       this.dialogVisible = value;
     },
-    async dialogConfirm(value)  {
+    async dialogConfirm(value) {
       this.dialogVisible = value;
       const result = await this.session.logout();
       if (result) {
@@ -93,7 +93,7 @@ export default defineComponent({
   />
 </template>
 
-<style>
+<style scoped>
 .flex-grow {
   flex-grow: 1;
 }

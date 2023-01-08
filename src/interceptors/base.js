@@ -1,6 +1,6 @@
 import axios from "axios";
 const { VITE_API_URL } = import.meta.env;
-import { useSessionStore } from "../stores/session";
+import { useSessionStore } from "@/stores/session";
 
 axios.interceptors.request.use((request) => {
   const session = useSessionStore();

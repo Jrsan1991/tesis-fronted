@@ -1,4 +1,4 @@
-<script  lang="js">
+<script>
 import { defineComponent } from "vue";
 
 export default defineComponent({

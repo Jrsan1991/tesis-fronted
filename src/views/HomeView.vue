@@ -1,4 +1,4 @@
-<script lang="js">
+<script>
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -10,5 +10,5 @@ export default defineComponent({
   <p>HomeView</p>
 </template>
 
-<style>
+<style scoped>
 </style>

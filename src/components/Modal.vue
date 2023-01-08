@@ -1,4 +1,4 @@
-<script lang="js">
+<script>
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -26,5 +26,5 @@ export default defineComponent({
   </el-dialog>
 </template>
 
-<style>
+<style scoped>
 </style>
