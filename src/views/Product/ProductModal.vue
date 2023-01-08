@@ -1,21 +1,23 @@
 <script>
 import { defineComponent } from "vue";
 import { ElNotification } from "element-plus";
-import { useUserStore } from "@/stores/user";
+import { useProductStore } from "@/stores/product";
+import { useCategoryStore } from "@/stores/category";
 import { getError } from "@/utils/helpers";
-import grades from "@/data/grades";
 
 export default defineComponent({
-  name: "UserModal",
+  name: "ProductModal",
   props: {
     id: Number,
     readOnly: Boolean,
     screen: Object,
   },
   setup() {
-    const store = useUserStore();
+    const store = useProductStore();
+    const storeCategory = useCategoryStore();
     return {
       store,
+      storeCategory,
     };
   },
   data() {
@@ -28,6 +30,13 @@ export default defineComponent({
   computed: {
     rules() {
       return {
+        serial: [
+          {
+            required: true,
+            message: "Por favor ingresa la serie",
+            trigger: "blur",
+          },
+        ],
         name: [
           {
             required: true,
@@ -35,52 +44,49 @@ export default defineComponent({
             trigger: "blur",
           },
         ],
-        password: [
-          {
-            required:
-              !this.id ||
-              (this.formData.password && this.formData.password.length > 0),
-            message: "Por favor ingresa la contraseña",
-            trigger: "blur",
-          },
-        ],
-        password_confirmation: [
-          {
-            required:
-              !this.id ||
-              (this.formData.password && this.formData.password.length > 0),
-            message: "Por favor ingresa la confirmación",
-            trigger: "blur",
-          },
-        ],
-        credential: [
+        type: [
           {
             required: true,
-            message: "Por favor ingresa la cédula",
+            message: "Por favor ingresa el tipo",
             trigger: "blur",
           },
         ],
-        email: [
+        brand: [
           {
-            required: true,
-            message: "Por favor ingresa el correo",
+            required: false,
+            message: "Por favor ingresa la marca",
             trigger: "blur",
           },
         ],
-        grade: [
+        state: [
           {
             required: true,
-            message: "Por favor ingresa el grado",
+            message: "Por favor ingresa el estado",
+            trigger: "blur",
+          },
+        ],
+        quantity: [
+          {
+            required: true,
+            message: "Por favor ingresa la cantidad",
+            trigger: "blur",
+          },
+        ],
+        detail: [
+          {
+            required: false,
+            message: "Por favor ingresa el detalle",
+            trigger: "blur",
+          },
+        ],
+        category_id: [
+          {
+            required: true,
+            message: "Por favor ingresa la categoria",
             trigger: "blur",
           },
         ],
       };
-    },
-    passwordMatch() {
-      return this.formData.password === this.formData.password_confirmation;
-    },
-    gradeList() {
-      return grades;
     },
   },
   mounted() {
@@ -91,7 +97,7 @@ export default defineComponent({
   methods: {
     async getData() {
       this.loading = true;
-      const result = await this.store.getUser(this.id);
+      const result = await this.store.getProduct(this.id);
       if (result.error === 0) {
         const { created_at, updated_at, email_verified_at, ...data } =
           result.data;
@@ -103,22 +109,10 @@ export default defineComponent({
       this.$emit("modalCancel");
     },
     handleConfirm() {
-      this.$refs["userForm"].validate(async (valid) => {
+      this.$refs["productForm"].validate(async (valid) => {
         if (valid) {
-          if (this.formData.password?.length > 0 && !this.passwordMatch) {
-            ElNotification({
-              title: "Error",
-              message: "La contraseña y la confirmación no coinciden",
-              type: "error",
-            });
-            return;
-          }
           this.loading = true;
-          const user = { ...this.formData };
-          if (!this.id) {
-            user.role = "user";
-          }
-          const result = await this.store.postUser(user);
+          const result = await this.store.postProduct({ ...this.formData });
           if (result.error > 0) {
             ElNotification({
               title: "Error",
@@ -145,13 +139,15 @@ export default defineComponent({
 
 <template>
   <el-dialog
-    :title="readOnly ? 'Usuario' : `${id > 0 ? 'Editar' : 'Registrar'} usuario`"
+    :title="
+      readOnly ? 'Producto' : `${id > 0 ? 'Editar' : 'Registrar'} producto`
+    "
     v-model="modalVisible"
     :before-close="handleClose"
     :width="screen.dialogWidth"
   >
     <el-form
-      ref="userForm"
+      ref="productForm"
       v-loading="loading"
       :model="formData"
       status-icon
@@ -159,6 +155,13 @@ export default defineComponent({
       label-width="120"
       :label-position="screen.labelPosition"
     >
+      <el-form-item label="Serie" prop="serial">
+        <el-input
+          v-model="formData.serial"
+          autocomplete="off"
+          :disabled="readOnly || loading"
+        />
+      </el-form-item>
       <el-form-item label="Nombre" prop="name">
         <el-input
           v-model="formData.name"
@@ -166,68 +169,56 @@ export default defineComponent({
           :disabled="readOnly || loading"
         />
       </el-form-item>
-      <el-form-item label="Contraseña" prop="password" v-if="!readOnly">
+      <el-form-item label="Tipo" prop="type">
         <el-input
-          v-model="formData.password"
-          type="password"
+          v-model="formData.type"
           autocomplete="off"
           :disabled="readOnly || loading"
         />
       </el-form-item>
-      <el-form-item
-        label="Confirmación"
-        prop="password_confirmation"
-        v-if="!readOnly"
-      >
+      <el-form-item label="Marca" prop="brand">
         <el-input
-          v-model="formData.password_confirmation"
-          type="password"
+          v-model="formData.brand"
           autocomplete="off"
           :disabled="readOnly || loading"
         />
       </el-form-item>
-      <el-form-item label="Cédula" prop="credential">
+      <el-form-item label="Estado" prop="state">
         <el-input
-          v-model="formData.credential"
+          v-model="formData.state"
           autocomplete="off"
           :disabled="readOnly || loading"
         />
       </el-form-item>
-      <el-form-item label="Correo" prop="email">
+      <el-form-item label="Cantidad" prop="quantity">
         <el-input
-          type="email"
-          v-model="formData.email"
+          type="number"
+          v-model="formData.quantity"
           autocomplete="off"
           :disabled="readOnly || loading"
         />
       </el-form-item>
-      <el-form-item label="Grado" prop="grade">
+      <el-form-item label="Detalle" prop="detail">
+        <el-input
+          type="textarea"
+          v-model="formData.detail"
+          autocomplete="off"
+          :disabled="readOnly || loading"
+        />
+      </el-form-item>
+      <el-form-item label="Categoria" prop="category_id">
         <el-select
-          v-model="formData.grade"
+          v-model="formData.category_id"
           placeholder="Seleccione"
           :disabled="readOnly || loading"
         >
           <el-option
-            v-for="(grade, key) in gradeList"
-            :key="`grade-${key}`"
-            :label="grade.label"
-            :value="grade.value"
+            v-for="(category, key) in storeCategory.categoryList"
+            :key="`category-${key}`"
+            :label="category.label"
+            :value="category.value"
           />
         </el-select>
-      </el-form-item>
-      <el-form-item label="Es visitante" prop="is_visit">
-        <el-switch
-          v-model="formData.is_visit"
-          :disabled="readOnly || loading"
-        />
-      </el-form-item>
-      <el-form-item label="Unidad" prop="visit_unity" v-if="formData.is_visit">
-        <el-input
-          type="number"
-          v-model="formData.visit_unity"
-          autocomplete="off"
-          :disabled="readOnly || loading"
-        />
       </el-form-item>
     </el-form>
     <template #footer>

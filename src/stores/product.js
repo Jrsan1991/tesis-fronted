@@ -3,13 +3,12 @@ import { ref, computed } from "vue";
 import axios from "axios";
 import { useRoute } from "vue-router";
 
-export const useCategoryStore = defineStore("category", function () {
+export const useProductStore = defineStore("product", function () {
   const loading = ref(false);
-  const categoryList = ref([]);
 
   const route = useRoute();
 
-  const getCategories = async () => {
+  const getProducts = async () => {
     const result = {
       error: 0,
       message: "",
@@ -19,7 +18,7 @@ export const useCategoryStore = defineStore("category", function () {
       const query = route.query;
       const params = new URLSearchParams(query).toString();
       loading.value = true;
-      const response = await axios.get(`category?${params}`);
+      const response = await axios.get(`product?${params}`);
       const { data } = response;
       result.data = data;
     } catch (error) {
@@ -32,7 +31,7 @@ export const useCategoryStore = defineStore("category", function () {
     return result;
   };
 
-  const getCategory = async (id) => {
+  const getProduct = async (id) => {
     const result = {
       error: 0,
       message: "",
@@ -40,7 +39,7 @@ export const useCategoryStore = defineStore("category", function () {
     };
     try {
       loading.value = true;
-      const response = await axios.get(`category/${id}`);
+      const response = await axios.get(`product/${id}`);
       const { data } = response;
       result.data = data.data;
     } catch (error) {
@@ -53,7 +52,7 @@ export const useCategoryStore = defineStore("category", function () {
     return result;
   };
 
-  const postCategory = async (category) => {
+  const postProduct = async (product) => {
     const result = {
       error: 0,
       message: "",
@@ -61,7 +60,7 @@ export const useCategoryStore = defineStore("category", function () {
     };
     try {
       loading.value = true;
-      const response = await axios.post("category", category);
+      const response = await axios.post("product", product);
       const { data } = response;
       result.data = data.data;
     } catch (error) {
@@ -74,29 +73,5 @@ export const useCategoryStore = defineStore("category", function () {
     return result;
   };
 
-  const loadCategories = async () => {
-    try {
-      const response = await axios.get("category");
-      const {
-        data: { data },
-      } = response;
-      categoryList.value = data.map((item) => {
-        return {
-          value: item.id,
-          label: item.name,
-        };
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  return {
-    loading,
-    getCategories,
-    getCategory,
-    postCategory,
-    loadCategories,
-    categoryList,
-  };
+  return { loading, getProducts, getProduct, postProduct };
 });

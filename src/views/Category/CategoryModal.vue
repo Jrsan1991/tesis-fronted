@@ -3,7 +3,6 @@ import { defineComponent } from "vue";
 import { ElNotification } from "element-plus";
 import { useCategoryStore } from "@/stores/category";
 import { getError } from "@/utils/helpers";
-import grades from "@/data/grades";
 
 export default defineComponent({
   name: "CategoryModal",
