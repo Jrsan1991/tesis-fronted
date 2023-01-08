@@ -1,0 +1,17 @@
+[
+  { "value": "Gral.", "label": "Gral." },
+  { "value": "Crnl.", "label": "Crnl." },
+  { "value": "Tcnl.", "label": "Tcnl." },
+  { "value": "Mayr.", "label": "Mayr." },
+  { "value": "Cptn.", "label": "Cptn." },
+  { "value": "Tnte.", "label": "Tnte." },
+  { "value": "Sbte.", "label": "Sbte." },
+  { "value": "Sbom.", "label": "Sbom." },
+  { "value": "Sbop.", "label": "Sbop." },
+  { "value": "Sbos.", "label": "Sbos." },
+  { "value": "Sgop.", "label": "Sgop." },
+  { "value": "Sgos.", "label": "Sgos." },
+  { "value": "Cbop.", "label": "Cbop." },
+  { "value": "Cbos.", "label": "Cbos." },
+  { "value": "Poli.", "label": "Poli." }
+]

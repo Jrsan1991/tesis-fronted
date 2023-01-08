@@ -15,14 +15,11 @@ export default defineComponent({
     <el-header>
       <Navbar />
     </el-header>
-    <el-main class="bg">
+    <el-main>
       <RouterView />
     </el-main>
   </el-container>
 </template>
 
 <style scoped>
-.bg {
-  background-color: floralwhite;
-}
 </style>

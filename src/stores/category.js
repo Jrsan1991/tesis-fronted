@@ -3,12 +3,12 @@ import { ref, computed } from "vue";
 import axios from "axios";
 import { useRoute } from "vue-router";
 
-export const useUserStore = defineStore("user", function () {
+export const useCategoryStore = defineStore("category", function () {
   const loading = ref(false);
 
   const route = useRoute();
 
-  const getUsers = async () => {
+  const getCategories = async () => {
     const result = {
       error: 0,
       message: "",
@@ -18,7 +18,7 @@ export const useUserStore = defineStore("user", function () {
       const query = route.query;
       const params = new URLSearchParams(query).toString();
       loading.value = true;
-      const response = await axios.get(`users?${params}`);
+      const response = await axios.get(`category?${params}`);
       const { data } = response;
       result.data = data;
     } catch (error) {
@@ -31,7 +31,7 @@ export const useUserStore = defineStore("user", function () {
     return result;
   };
 
-  const getUser = async (id) => {
+  const getCategory = async (id) => {
     const result = {
       error: 0,
       message: "",
@@ -39,7 +39,7 @@ export const useUserStore = defineStore("user", function () {
     };
     try {
       loading.value = true;
-      const response = await axios.get(`users/${id}`);
+      const response = await axios.get(`category/${id}`);
       const { data } = response;
       result.data = data.data;
     } catch (error) {
@@ -52,7 +52,7 @@ export const useUserStore = defineStore("user", function () {
     return result;
   };
 
-  const postUser = async (user) => {
+  const postCategory = async (category) => {
     const result = {
       error: 0,
       message: "",
@@ -60,7 +60,7 @@ export const useUserStore = defineStore("user", function () {
     };
     try {
       loading.value = true;
-      const response = await axios.post("users", user);
+      const response = await axios.post("category", category);
       const { data } = response;
       result.data = data.data;
     } catch (error) {
@@ -73,5 +73,5 @@ export const useUserStore = defineStore("user", function () {
     return result;
   };
 
-  return { loading, getUsers, getUser, postUser };
+  return { loading, getCategories, getCategory, postCategory };
 });

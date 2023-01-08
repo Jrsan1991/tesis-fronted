@@ -1,20 +1,20 @@
 <script>
 import { defineComponent } from "vue";
-import { useUserStore } from "@/stores/user";
-import UserModal from "./UserModal.vue";
+import { useCategoryStore } from "@/stores/category";
+import CategoryModal from "./CategoryModal.vue";
 import Search from "@/components/Search.vue";
 import Pager from "@/components/Pager.vue";
 import resize from "@/components/resize";
 
 export default defineComponent({
-  name: "UserView",
+  name: "CategoryView",
   components: {
-    UserModal,
+    CategoryModal,
     Search,
     Pager,
   },
   setup() {
-    const store = useUserStore();
+    const store = useCategoryStore();
     return {
       store,
     };
@@ -24,7 +24,7 @@ export default defineComponent({
     return {
       modalVisible: false,
       readOnly: false,
-      users: [],
+      categories: [],
       row: {},
       pageSize: 10,
       total: 10,
@@ -35,10 +35,10 @@ export default defineComponent({
   },
   methods: {
     async getData() {
-      const result = await this.store.getUsers();
+      const result = await this.store.getCategories();
       if (result.error === 0) {
         const { data, meta } = result.data;
-        this.users = data;
+        this.categories = data;
         this.pageSize = meta.per_page;
         this.total = meta.total;
       }
@@ -75,8 +75,8 @@ export default defineComponent({
   <el-card v-loading="store.loading">
     <div class="flex" v-if="screen.mobile">
       <el-card
-        v-for="item in users"
-        :key="'user' + item.id"
+        v-for="item in categories"
+        :key="'category' + item.id"
         shadow="always"
         class="mobile_card"
       >
@@ -110,35 +110,10 @@ export default defineComponent({
             </div>
           </div>
         </template>
-        <div class="card-header">
-          <p class="label">Credencial:</p>
-          <p class="data">{{ item.credential }}</p>
-        </div>
-        <div class="card-header">
-          <p class="label">Correo:</p>
-          <p class="data">{{ item.email }}</p>
-        </div>
-        <div class="card-header">
-          <p class="label">Grado:</p>
-          <p class="data">{{ item.grade }}</p>
-        </div>
-        <div class="card-header">
-          <p class="label">Visitante:</p>
-          <p class="data">{{ item.is_visit ? "Si" : "No" }}</p>
-        </div>
       </el-card>
     </div>
-    <el-table v-if="!screen.mobile" :data="users" stripe width="100%">
+    <el-table v-if="!screen.mobile" :data="categories" stripe width="100%">
       <el-table-column prop="name" label="Nombre" min-width="150" />
-      <el-table-column prop="credential" label="Cédula" min-width="100" />
-      <el-table-column prop="email" label="Correo" min-width="150" />
-      <el-table-column prop="grade" label="Grado" min-width="100" />
-      <el-table-column prop="is_visit" label="Es visitante">
-        <template #default="scope">
-          {{ scope.row.is_visit ? "Si" : "No" }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="visit_unity" label="Unidad" />
       <el-table-column fixed="right" label="Acciones" width="100">
         <template #default="scope">
           <el-button
@@ -164,7 +139,7 @@ export default defineComponent({
     </el-table>
     <Pager :pageSize="pageSize" :total="total" @search="getData" />
   </el-card>
-  <UserModal
+  <CategoryModal
     v-if="modalVisible"
     :id="row.id"
     :readOnly="readOnly"
