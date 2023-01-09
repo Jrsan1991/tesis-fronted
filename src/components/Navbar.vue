@@ -1,6 +1,7 @@
 <script>
 import { defineComponent } from "vue";
 import { ElNotification } from "element-plus";
+import resize from "@/components/resize";
 
 import { useSessionStore } from "@/stores/session";
 import Dialog from "@/components/Dialog.vue";
@@ -16,6 +17,7 @@ export default defineComponent({
       session,
     };
   },
+  mixins: [resize],
   data() {
     return {
       activeIndex: "0",
@@ -56,12 +58,14 @@ export default defineComponent({
   <el-menu
     :default-active="activeIndex"
     mode="horizontal"
-    :ellipsis="false"
+    :ellipsis="screen.mobile"
     @select="handleSelect"
     background-color="none"
     :router="true"
   >
-    <el-menu-item index="/">LOGO</el-menu-item>
+    <el-menu-item index="/">
+      <img class="logo_navbar" src="@/assets/logo.png" />
+    </el-menu-item>
     <div class="flex-grow" />
 
     <el-sub-menu index="1">
@@ -96,5 +100,10 @@ export default defineComponent({
 <style scoped>
 .flex-grow {
   flex-grow: 1;
+}
+
+.logo_navbar {
+  width: auto;
+  height: 50px;
 }
 </style>

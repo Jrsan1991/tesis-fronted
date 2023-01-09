@@ -3,6 +3,7 @@ import { defineComponent } from "vue";
 import { ElNotification } from "element-plus";
 import { useSessionStore } from "@/stores/session";
 import { getError } from "@/utils/helpers";
+import resize from "@/components/resize";
 
 export default defineComponent({
   name: "LoginView",
@@ -12,6 +13,7 @@ export default defineComponent({
       session,
     };
   },
+  mixins: [resize],
   data() {
     return {
       formData: {
@@ -69,6 +71,9 @@ export default defineComponent({
 <template>
   <el-row align="middle" justify="center">
     <el-col :xs="18" :sm="12" :md="10" :lg="8">
+      <div class="logo_div">
+        <img class="logo_main" src="@/assets/logo.png" />
+      </div>
       <h1 class="text-center">Inicio de sesión</h1>
       <el-form
         ref="loginForm"
@@ -76,6 +81,7 @@ export default defineComponent({
         status-icon
         :rules="rules"
         label-width="80px"
+        :label-position="screen.labelPosition"
       >
         <el-form-item label="Correo" prop="email">
           <el-input
@@ -95,12 +101,14 @@ export default defineComponent({
           />
         </el-form-item>
         <el-form-item>
-          <el-button
-            type="primary"
-            @click="submitForm('loginForm')"
-            :loading="session.loading"
-            >Acceder</el-button
-          >
+          <div class="align-right">
+            <el-button
+              type="primary"
+              @click="submitForm('loginForm')"
+              :loading="session.loading"
+              >Acceder</el-button
+            >
+          </div>
         </el-form-item>
       </el-form>
     </el-col>
@@ -108,7 +116,23 @@ export default defineComponent({
 </template>
 
 <style scoped>
+.align-right {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: right;
+  align-items: right;
+  width: 100%;
+}
 .el-row {
   min-height: 100vh;
+}
+
+.logo_main {
+  width: 100px;
+  height: auto;
+}
+
+.logo_div {
+  text-align: center;
 }
 </style>
