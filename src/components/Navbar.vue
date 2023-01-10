@@ -8,9 +8,9 @@ import { useSessionStore } from "@/stores/session";
 export default defineComponent({
   name: "Navbar",
   setup() {
-    const session = useSessionStore();
+    const store = useSessionStore();
     return {
-      session,
+      store,
     };
   },
   mixins: [resize],
@@ -18,6 +18,11 @@ export default defineComponent({
     return {
       activeIndex: "0",
     };
+  },
+  computed: {
+    isAdmin() {
+      return this.store.user.role === "admin";
+    },
   },
   created() {
     this.activeIndex = this.$route.path;
@@ -28,10 +33,10 @@ export default defineComponent({
       try {
         await ElMessageBox.confirm("¿Desea cerrar su sesión?", "Confirmar", {
           confirmButtonText: "Aceptar",
-          cancelButtonText: "Cancel",
+          cancelButtonText: "Cancelar",
           type: "warning",
         });
-        const result = await this.session.logout();
+        const result = await this.store.logout();
         if (result) {
           ElMessage({
             type: "success",
@@ -65,11 +70,11 @@ export default defineComponent({
 
     <div class="flex-grow" />
 
-    <el-sub-menu index="1">
+    <el-sub-menu index="1" v-if="isAdmin">
       <template #title>Usuarios</template>
       <el-menu-item index="/users">Usuarios</el-menu-item>
     </el-sub-menu>
-    <el-sub-menu index="2">
+    <el-sub-menu index="2" v-if="isAdmin">
       <template #title>Productos</template>
       <el-menu-item index="/products">Productos</el-menu-item>
       <el-menu-item index="/categories">Categorias</el-menu-item>
@@ -79,7 +84,7 @@ export default defineComponent({
       <el-menu-item index="/assignments">Asignaciones</el-menu-item>
     </el-sub-menu>
     <el-sub-menu index="4">
-      <template #title>{{ session.user.name }}</template>
+      <template #title>{{ store.user.name }}</template>
       <el-menu-item index="profile">Perfil</el-menu-item>
       <el-menu-item index="" @click="handleLogout">Salir</el-menu-item>
     </el-sub-menu>
