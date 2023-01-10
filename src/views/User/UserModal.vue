@@ -1,6 +1,6 @@
 <script>
 import { defineComponent } from "vue";
-import { ElNotification } from "element-plus";
+import { ElMessage } from "element-plus";
 import { useUserStore } from "@/stores/user";
 import { getError } from "@/utils/helpers";
 import grades from "@/data/grades";
@@ -106,10 +106,9 @@ export default defineComponent({
       this.$refs["userForm"].validate(async (valid) => {
         if (valid) {
           if (this.formData.password?.length > 0 && !this.passwordMatch) {
-            ElNotification({
-              title: "Error",
-              message: "La contraseña y la confirmación no coinciden",
+            ElMessage({
               type: "error",
+              message: "La contraseña y la confirmación no coinciden",
             });
             return;
           }
@@ -120,16 +119,14 @@ export default defineComponent({
           }
           const result = await this.store.postUser(user);
           if (result.error > 0) {
-            ElNotification({
-              title: "Error",
-              message: getError(result.data),
+            ElMessage({
               type: "error",
+              message: getError(result.data),
             });
           } else {
-            ElNotification({
-              title: "Success",
-              message: "Guardado con éxito",
+            ElMessage({
               type: "success",
+              message: "Guardado con éxito",
             });
             this.$emit("modalConfirm");
           }

@@ -1,16 +1,12 @@
 <script>
 import { defineComponent } from "vue";
-import { ElNotification } from "element-plus";
+import { ElMessageBox, ElMessage } from "element-plus";
 import resize from "@/components/resize";
 
 import { useSessionStore } from "@/stores/session";
-import Dialog from "@/components/Dialog.vue";
 
 export default defineComponent({
   name: "Navbar",
-  components: {
-    Dialog,
-  },
   setup() {
     const session = useSessionStore();
     return {
@@ -21,34 +17,34 @@ export default defineComponent({
   data() {
     return {
       activeIndex: "0",
-      dialogVisible: false,
     };
+  },
+  created() {
+    this.activeIndex = this.$route.path;
   },
   methods: {
     handleSelect(key, keyPath) {},
-    handleLogout() {
-      this.dialogVisible = true;
-    },
-    dialogCancel(value) {
-      this.dialogVisible = value;
-    },
-    async dialogConfirm(value) {
-      this.dialogVisible = value;
-      const result = await this.session.logout();
-      if (result) {
-        ElNotification({
-          title: "Success",
-          message: `Sesión cerrada con éxito`,
-          type: "success",
+    async handleLogout() {
+      try {
+        await ElMessageBox.confirm("¿Desea cerrar su sesión?", "Confirmar", {
+          confirmButtonText: "Aceptar",
+          cancelButtonText: "Cancel",
+          type: "warning",
         });
-        this.$router.push("/login");
-      } else {
-        ElNotification({
-          title: "Error",
-          message: "Error al intentar cerrar la sesión",
-          type: "error",
-        });
-      }
+        const result = await this.session.logout();
+        if (result) {
+          ElMessage({
+            type: "success",
+            message: "Sesión cerrada con éxito",
+          });
+          this.$router.push("/login");
+        } else {
+          ElMessage({
+            type: "error",
+            message: "Error al intentar cerrar la sesión",
+          });
+        }
+      } catch (error) {}
     },
   },
 });
@@ -66,6 +62,7 @@ export default defineComponent({
     <el-menu-item index="/">
       <img class="logo_navbar" src="@/assets/logo.png" />
     </el-menu-item>
+
     <div class="flex-grow" />
 
     <el-sub-menu index="1">
@@ -87,14 +84,6 @@ export default defineComponent({
       <el-menu-item index="" @click="handleLogout">Salir</el-menu-item>
     </el-sub-menu>
   </el-menu>
-
-  <Dialog
-    v-model="dialogVisible"
-    title="Confirmar"
-    message="¿Desea cerrar su sesión?"
-    @dialogCancel="dialogCancel"
-    @dialogConfirm="dialogConfirm"
-  />
 </template>
 
 <style scoped>
