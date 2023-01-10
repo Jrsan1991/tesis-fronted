@@ -43,6 +43,11 @@ const router = createRouter({
           name: "Asignaciones",
           component: () => import("@/views/Assignment/AssignmentView.vue"),
         },
+        {
+          path: "profile",
+          name: "Profile",
+          component: () => import("@/views/ProfileView.vue"),
+        },
       ],
     },
   ],

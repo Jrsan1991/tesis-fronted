@@ -43,5 +43,22 @@ export const useSessionStore = defineStore("session", () => {
     return result;
   };
 
-  return { loading, token, user, login, logout };
+  const getLoggedUser = async (credentials) => {
+    const result = {
+      error: 0,
+      message: "",
+    };
+    try {
+      const response = await axios.get("user");
+      const { data } = response;
+      user.value = data;
+    } catch (error) {
+      const { response } = error;
+      result.error = response.status;
+      result.data = response.data;
+    }
+    return result;
+  };
+
+  return { loading, token, user, login, logout, getLoggedUser };
 });

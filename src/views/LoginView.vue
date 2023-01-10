@@ -116,13 +116,6 @@ export default defineComponent({
 </template>
 
 <style scoped>
-.align-right {
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: right;
-  align-items: right;
-  width: 100%;
-}
 .el-row {
   min-height: 100vh;
 }
