@@ -211,6 +211,8 @@ export default defineComponent({
           v-model="formData.category_id"
           placeholder="Seleccione"
           :disabled="readOnly || loading"
+          filterable
+          style="width: 100%;"
         >
           <el-option
             v-for="(category, key) in storeCategory.categoryList"

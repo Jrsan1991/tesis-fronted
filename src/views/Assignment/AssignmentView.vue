@@ -1,6 +1,8 @@
 <script>
 import { defineComponent } from "vue";
 import { useAssignmentStore } from "@/stores/assignment";
+import moment from 'moment';
+import 'moment/locale/es';
 import AssignmentModal from "./AssignmentModal.vue";
 import Search from "@/components/Search.vue";
 import Pager from "@/components/Pager.vue";
@@ -29,6 +31,9 @@ export default defineComponent({
       pageSize: 10,
       total: 10,
     };
+  },
+  created() {
+    this.moment = moment;
   },
   mounted() {
     this.getData();
@@ -112,7 +117,7 @@ export default defineComponent({
         </template>
         <div class="card-header">
           <p class="label">Fecha:</p>
-          <p class="data">{{ item.transaction_date }}</p>
+          <p class="data">{{ moment(item.transaction_date).format("YYYY-MM-DD") }}</p>
         </div>
         <div class="card-header">
           <p class="label">Tipo:</p>
@@ -132,11 +137,25 @@ export default defineComponent({
         </div>
       </el-card>
     </div>
-    <el-table v-if="!screen.mobile" :data="products" stripe width="100%">
-      <el-table-column prop="transaction_date" label="Serie" min-width="100" />
-      <el-table-column prop="is_return" label="Nombre" min-width="150" />
-      <el-table-column prop="user.name" label="Tipo" min-width="100" />
-      <el-table-column prop="user.credential" label="Marca" min-width="100" />
+    <el-table v-if="!screen.mobile" :data="assignments" stripe width="100%">
+      <el-table-column prop="document_number" label="Número documento" min-width="150" />
+      <el-table-column prop="transaction_date" label="Fecha" min-width="150">
+        <template #default="scope">
+          {{ moment(scope.transaction_date).format("YYYY-MM-DD") }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="is_return" label="Tipo" min-width="100">
+        <template #default="scope">
+          {{ scope.is_return ? 'Recepción' : 'Entrega' }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="user.name" label="Usuario" min-width="150" />
+      <el-table-column prop="user.credential" label="Cédula" min-width="120" />
+      <el-table-column prop="voided" label="Estado" min-width="150">
+        <template #default="scope">
+          {{ scope.voided ? 'Anulada' : 'Activo' }}
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" label="Acciones" width="100">
         <template #default="scope">
           <el-button
@@ -162,7 +181,7 @@ export default defineComponent({
     </el-table>
     <Pager :pageSize="pageSize" :total="total" @search="getData" />
   </el-card>
-  <ProductModal
+  <AssignmentModal
     v-if="modalVisible"
     :id="row.id"
     :readOnly="readOnly"

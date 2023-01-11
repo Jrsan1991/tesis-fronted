@@ -31,6 +31,28 @@ export const useUserStore = defineStore("user", function () {
     return result;
   };
 
+  const findUsers = async (query) => {
+    const result = {
+      error: 0,
+      message: "",
+      data: [],
+    };
+    try {
+      const params = new URLSearchParams(query).toString();
+      loading.value = true;
+      const response = await axios.get(`users?${params}`);
+      const { data } = response;
+      result.data = data;
+    } catch (error) {
+      const { response } = error;
+      result.error = response.status;
+      result.data = response.data;
+    } finally {
+      loading.value = false;
+    }
+    return result;
+  };
+
   const getUser = async (id) => {
     const result = {
       error: 0,
@@ -73,5 +95,5 @@ export const useUserStore = defineStore("user", function () {
     return result;
   };
 
-  return { loading, getUsers, getUser, postUser };
+  return { loading, getUsers, findUsers, getUser, postUser };
 });

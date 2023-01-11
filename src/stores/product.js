@@ -31,6 +31,28 @@ export const useProductStore = defineStore("product", function () {
     return result;
   };
 
+  const findProducts = async (query) => {
+    const result = {
+      error: 0,
+      message: "",
+      data: [],
+    };
+    try {
+      const params = new URLSearchParams(query).toString();
+      loading.value = true;
+      const response = await axios.get(`product?${params}`);
+      const { data } = response;
+      result.data = data;
+    } catch (error) {
+      const { response } = error;
+      result.error = response.status;
+      result.data = response.data;
+    } finally {
+      loading.value = false;
+    }
+    return result;
+  };
+
   const getProduct = async (id) => {
     const result = {
       error: 0,
@@ -73,5 +95,5 @@ export const useProductStore = defineStore("product", function () {
     return result;
   };
 
-  return { loading, getProducts, getProduct, postProduct };
+  return { loading, getProducts, findProducts, getProduct, postProduct };
 });

@@ -1,23 +1,30 @@
 <script>
 import { defineComponent } from "vue";
 import { ElNotification } from "element-plus";
+import { useAssignmentStore } from "@/stores/assignment";
 import { useProductStore } from "@/stores/product";
-import { useCategoryStore } from "@/stores/category";
+import { useUserStore } from "@/stores/user";
 import { getError } from "@/utils/helpers";
 
 export default defineComponent({
-  name: "ProductModal",
+  name: "AssignmentModal",
   props: {
     id: Number,
     readOnly: Boolean,
     screen: Object,
+    user: {
+      type: Object,
+      default: null,
+    },
   },
   setup() {
-    const store = useProductStore();
-    const storeCategory = useCategoryStore();
+    const store = useAssignmentStore();
+    const storeUser = useUserStore();
+    const storeProduct = useProductStore();
     return {
       store,
-      storeCategory,
+      storeUser,
+      storeProduct,
     };
   },
   data() {
@@ -25,6 +32,9 @@ export default defineComponent({
       loading: false,
       modalVisible: true,
       formData: {},
+      userLoading: false,
+      users: [],
+      products: [],
     };
   },
   computed: {
@@ -92,12 +102,33 @@ export default defineComponent({
   mounted() {
     if (this.id) {
       this.getData();
+    } else {
+      this.formData = {
+        document_number: '00001',
+        transaction_date: new Date(),
+        is_return: false,
+        voided: false,
+        details: [],
+      }
     }
   },
   methods: {
+    async loadUsers(query) {
+      const result = await this.storeUser.findUsers({keyword: query});
+      if (result.error === 0){
+        this.users = result.data.data;
+      }
+    },
+    async loadProduct(query) {
+      const result = await this.storeProduct.findProducts({keyword: query});
+      console.log(query);
+      if (result.error === 0){
+        this.products = result.data.data;
+      }
+    },
     async getData() {
       this.loading = true;
-      const result = await this.store.getProduct(this.id);
+      const result = await this.store.getAssignment(this.id);
       if (result.error === 0) {
         const { created_at, updated_at, email_verified_at, ...data } =
           result.data;
@@ -109,10 +140,10 @@ export default defineComponent({
       this.$emit("modalCancel");
     },
     handleConfirm() {
-      this.$refs["productForm"].validate(async (valid) => {
+      this.$refs["assignmentForm"].validate(async (valid) => {
         if (valid) {
           this.loading = true;
-          const result = await this.store.postProduct({ ...this.formData });
+          const result = await this.store.postAssignment({ ...this.formData });
           if (result.error > 0) {
             ElNotification({
               title: "Error",
@@ -133,6 +164,18 @@ export default defineComponent({
         }
       });
     },
+    addLine() {
+      this.formData.details.push({
+        quantity: 0,
+        description: null,
+        product_id: null,
+      });
+    },
+    deleteLine(index) {
+      if (index > -1) {
+        this.formData.details.splice(index, 1);
+      }
+    },
   },
 });
 </script>
@@ -140,14 +183,14 @@ export default defineComponent({
 <template>
   <el-dialog
     :title="
-      readOnly ? 'Producto' : `${id > 0 ? 'Editar' : 'Registrar'} producto`
+      readOnly ? 'Asignación' : `${id > 0 ? 'Editar' : 'Registrar'} asignación`
     "
     v-model="modalVisible"
     :before-close="handleClose"
     :width="screen.dialogWidth"
   >
     <el-form
-      ref="productForm"
+      ref="assignmentForm"
       v-loading="loading"
       :model="formData"
       status-icon
@@ -155,71 +198,118 @@ export default defineComponent({
       label-width="120"
       :label-position="screen.labelPosition"
     >
-      <el-form-item label="Serie" prop="serial">
+      <el-form-item label="N° Documento" prop="document_number">
         <el-input
-          v-model="formData.serial"
+          v-model="formData.document_number"
           autocomplete="off"
           :disabled="readOnly || loading"
         />
       </el-form-item>
-      <el-form-item label="Nombre" prop="name">
-        <el-input
-          v-model="formData.name"
-          autocomplete="off"
-          :disabled="readOnly || loading"
+      <el-form-item label="Fecha" prop="transaction_date">
+        <el-date-picker
+          v-model="formData.transaction_date"
+          type="date"
+          placeholder="Fecha asignación"
+          style="width: 100%;"
         />
       </el-form-item>
-      <el-form-item label="Tipo" prop="type">
-        <el-input
-          v-model="formData.type"
-          autocomplete="off"
-          :disabled="readOnly || loading"
-        />
+      <el-form-item prop="is_return">
+        <el-checkbox v-model="formData.is_return" label="Es devolución" />
       </el-form-item>
-      <el-form-item label="Marca" prop="brand">
-        <el-input
-          v-model="formData.brand"
-          autocomplete="off"
-          :disabled="readOnly || loading"
-        />
-      </el-form-item>
-      <el-form-item label="Estado" prop="state">
-        <el-input
-          v-model="formData.state"
-          autocomplete="off"
-          :disabled="readOnly || loading"
-        />
-      </el-form-item>
-      <el-form-item label="Cantidad" prop="quantity">
-        <el-input
-          type="number"
-          v-model="formData.quantity"
-          autocomplete="off"
-          :disabled="readOnly || loading"
-        />
-      </el-form-item>
-      <el-form-item label="Detalle" prop="detail">
-        <el-input
-          type="textarea"
-          v-model="formData.detail"
-          autocomplete="off"
-          :disabled="readOnly || loading"
-        />
-      </el-form-item>
-      <el-form-item label="Categoria" prop="category_id">
+      <el-form-item label="Usuario" prop="user_id">
         <el-select
-          v-model="formData.category_id"
+          v-model="formData.user_id"
           placeholder="Seleccione"
+          filterable
+          remote
+          :remote-method="loadUsers"
+          :loading="storeUser.loading"
           :disabled="readOnly || loading"
+          style="width: 100%;"
         >
           <el-option
-            v-for="(category, key) in storeCategory.categoryList"
-            :key="`category-${key}`"
-            :label="category.label"
-            :value="category.value"
+            v-for="(user, key) in users"
+            :key="`user-${key}`"
+            :label="user.credential + ' - ' + user.name"
+            :value="user.id"
           />
         </el-select>
       </el-form-item>
+      <el-card>
+        <template #header>
+          <div class="card-header">
+            <span class="data">Detalle</span>
+          </div>
+        </template>
+        <div>
+          <el-empty v-if="formData.details.length === 0"/>
+          <el-card
+            v-for="(detail, index) in formData.details"
+            :key="'detail' + detail.id"
+            shadow="always"
+            class="mobile_card"
+          >
+            <el-row :gutter="20">
+              <el-col :sm="24" :md="10" :lg="7">
+                <el-form-item label="Cantidad" :prop="index+'quantity'">
+                  <el-input-number v-model="detail.quantity" size="small" style="width: 100%;" />
+                </el-form-item>
+              </el-col>
+              <el-col :sm="24" :md="14" :lg="17">
+                <el-form-item label="Producto" :prop="index+'product_id'">
+                  <el-select
+                    v-model="detail.product_id"
+                    placeholder="Seleccione"
+                    filterable
+                    remote
+                    :remote-method="loadProduct"
+                    :loading="storeUser.loading"
+                    :disabled="readOnly || loading"
+                    style="width: 100%;"
+                  >
+                    <el-option
+                      v-for="(product, key) in products"
+                      :key="`product-${key}`"
+                      :label="product.category.name + ' - ' + product.name"
+                      :value="product.id"
+                    />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :sm="24" :md="24">
+                <el-form-item label="Descripción" :prop="index+'description'">
+                  <el-input
+                    v-model="detail.description"
+                    type="textarea"
+                    :autosize="{ minRows: 2, maxRows: 4 }"
+                    size="small"
+                  />
+                </el-form-item>
+              </el-col>
+              <el-col :sm="24" :md="24">
+                <div class="add_line_div">
+                  <el-button
+                    type="danger"
+                    size="small"
+                    @click="deleteLine(index)"
+                  >
+                    <font-awesome-icon class="button_icon" icon="fa-solid fa-trash" />
+                  </el-button>
+                </div>
+              </el-col>
+            </el-row>
+          </el-card>
+        </div>
+        <div class="add_line_div">
+          <el-button
+            type="primary"
+            @click="addLine"
+            v-if="!readOnly"
+          >
+            <font-awesome-icon class="button_icon" icon="fa-solid fa-plus" /> Añadir linea
+          </el-button>
+        </div>
+      </el-card>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
@@ -239,4 +329,11 @@ export default defineComponent({
   </el-dialog>
 </template>
 
-<style scoped></style>
+<style scoped>
+.add_line_div{
+  text-align: right;
+}
+.mobile_card {
+  margin: 5px 0 5px 0;
+}
+</style>
