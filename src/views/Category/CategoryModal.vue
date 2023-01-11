@@ -1,6 +1,6 @@
 <script>
 import { defineComponent } from "vue";
-import { ElNotification } from "element-plus";
+import { ElMessage } from "element-plus";
 import { useCategoryStore } from "@/stores/category";
 import { getError } from "@/utils/helpers";
 
@@ -62,16 +62,14 @@ export default defineComponent({
           this.loading = true;
           const result = await this.store.postCategory({ ...this.formData });
           if (result.error > 0) {
-            ElNotification({
-              title: "Error",
-              message: getError(result.data),
+            ElMessage({
               type: "error",
+              message: getError(result.data),
             });
           } else {
-            ElNotification({
-              title: "Success",
-              message: "Guardado con éxito",
+            ElMessage({
               type: "success",
+              message: "Guardado con éxito",
             });
             this.$emit("modalConfirm");
           }

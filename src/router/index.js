@@ -5,6 +5,15 @@ import { useSessionStore } from "@/stores/session";
 import LoginView from "@/views/LoginView.vue";
 import Layout from "@/components/Layout.vue";
 
+const adminMiddleware = (to, from, next) => {
+  const session = useSessionStore();
+  if (session.user.role === "admin") {
+    next();
+  } else {
+    next({ name: "" });
+  }
+};
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -27,21 +36,29 @@ const router = createRouter({
           path: "users",
           name: "Users",
           component: () => import("@/views/User/UserView.vue"),
+          beforeEnter: adminMiddleware,
         },
         {
           path: "products",
           name: "Productos",
           component: () => import("@/views/Product/ProductView.vue"),
+          beforeEnter: adminMiddleware,
         },
         {
           path: "categories",
           name: "Categorias",
           component: () => import("@/views/Category/CategoryView.vue"),
+          beforeEnter: adminMiddleware,
         },
         {
           path: "assignments",
           name: "Asignaciones",
           component: () => import("@/views/Assignment/AssignmentView.vue"),
+        },
+        {
+          path: "profile",
+          name: "Profile",
+          component: () => import("@/views/ProfileView.vue"),
         },
       ],
     },

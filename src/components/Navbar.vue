@@ -1,54 +1,55 @@
 <script>
 import { defineComponent } from "vue";
-import { ElNotification } from "element-plus";
+import { ElMessageBox, ElMessage } from "element-plus";
 import resize from "@/components/resize";
 
 import { useSessionStore } from "@/stores/session";
-import Dialog from "@/components/Dialog.vue";
 
 export default defineComponent({
   name: "Navbar",
-  components: {
-    Dialog,
-  },
   setup() {
-    const session = useSessionStore();
+    const store = useSessionStore();
     return {
-      session,
+      store,
     };
   },
   mixins: [resize],
   data() {
     return {
       activeIndex: "0",
-      dialogVisible: false,
     };
+  },
+  computed: {
+    isAdmin() {
+      return this.store.user.role === "admin";
+    },
+  },
+  created() {
+    this.activeIndex = this.$route.path;
   },
   methods: {
     handleSelect(key, keyPath) {},
-    handleLogout() {
-      this.dialogVisible = true;
-    },
-    dialogCancel(value) {
-      this.dialogVisible = value;
-    },
-    async dialogConfirm(value) {
-      this.dialogVisible = value;
-      const result = await this.session.logout();
-      if (result) {
-        ElNotification({
-          title: "Success",
-          message: `Sesión cerrada con éxito`,
-          type: "success",
+    async handleLogout() {
+      try {
+        await ElMessageBox.confirm("¿Desea cerrar su sesión?", "Confirmar", {
+          confirmButtonText: "Aceptar",
+          cancelButtonText: "Cancelar",
+          type: "warning",
         });
-        this.$router.push("/login");
-      } else {
-        ElNotification({
-          title: "Error",
-          message: "Error al intentar cerrar la sesión",
-          type: "error",
-        });
-      }
+        const result = await this.store.logout();
+        if (result) {
+          ElMessage({
+            type: "success",
+            message: "Sesión cerrada con éxito",
+          });
+          this.$router.push("/login");
+        } else {
+          ElMessage({
+            type: "error",
+            message: "Error al intentar cerrar la sesión",
+          });
+        }
+      } catch (error) {}
     },
   },
 });
@@ -66,13 +67,14 @@ export default defineComponent({
     <el-menu-item index="/">
       <img class="logo_navbar" src="@/assets/logo.png" />
     </el-menu-item>
+
     <div class="flex-grow" />
 
-    <el-sub-menu index="1">
+    <el-sub-menu index="1" v-if="isAdmin">
       <template #title>Usuarios</template>
       <el-menu-item index="/users">Usuarios</el-menu-item>
     </el-sub-menu>
-    <el-sub-menu index="2">
+    <el-sub-menu index="2" v-if="isAdmin">
       <template #title>Productos</template>
       <el-menu-item index="/products">Productos</el-menu-item>
       <el-menu-item index="/categories">Categorias</el-menu-item>
@@ -82,19 +84,11 @@ export default defineComponent({
       <el-menu-item index="/assignments">Asignaciones</el-menu-item>
     </el-sub-menu>
     <el-sub-menu index="4">
-      <template #title>{{ session.user.name }}</template>
+      <template #title>{{ store.user.name }}</template>
       <el-menu-item index="profile">Perfil</el-menu-item>
       <el-menu-item index="" @click="handleLogout">Salir</el-menu-item>
     </el-sub-menu>
   </el-menu>
-
-  <Dialog
-    v-model="dialogVisible"
-    title="Confirmar"
-    message="¿Desea cerrar su sesión?"
-    @dialogCancel="dialogCancel"
-    @dialogConfirm="dialogConfirm"
-  />
 </template>
 
 <style scoped>

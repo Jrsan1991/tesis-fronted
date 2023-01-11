@@ -1,6 +1,6 @@
 <script>
 import { defineComponent } from "vue";
-import { ElNotification } from "element-plus";
+import { ElMessage } from "element-plus";
 import { useSessionStore } from "@/stores/session";
 import { getError } from "@/utils/helpers";
 import resize from "@/components/resize";
@@ -46,16 +46,14 @@ export default defineComponent({
           const result = await this.session.login({ ...this.formData });
 
           if (result.error > 0) {
-            ElNotification({
-              title: "Error",
-              message: getError(result.data),
+            ElMessage({
               type: "error",
+              message: getError(result.data),
             });
           } else {
-            ElNotification({
-              title: "Success",
-              message: `Bienvenid@ ${this.session.user.name}`,
+            ElMessage({
               type: "success",
+              message: `Bienvenid@ ${this.session.user.name}`,
             });
             this.$router.push("/");
           }
@@ -116,13 +114,6 @@ export default defineComponent({
 </template>
 
 <style scoped>
-.align-right {
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: right;
-  align-items: right;
-  width: 100%;
-}
 .el-row {
   min-height: 100vh;
 }

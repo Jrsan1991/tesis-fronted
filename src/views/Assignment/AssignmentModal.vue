@@ -1,7 +1,7 @@
 <script>
 import { defineComponent } from "vue";
-import { ElNotification } from "element-plus";
 import { useAssignmentStore } from "@/stores/assignment";
+import { ElMessage } from "element-plus";
 import { useProductStore } from "@/stores/product";
 import { useUserStore } from "@/stores/user";
 import { getError } from "@/utils/helpers";
@@ -145,16 +145,14 @@ export default defineComponent({
           this.loading = true;
           const result = await this.store.postAssignment({ ...this.formData });
           if (result.error > 0) {
-            ElNotification({
-              title: "Error",
-              message: getError(result.data),
+            ElMessage({
               type: "error",
+              message: getError(result.data),
             });
           } else {
-            ElNotification({
-              title: "Success",
-              message: "Guardado con éxito",
+            ElMessage({
               type: "success",
+              message: "Guardado con éxito",
             });
             this.$emit("modalConfirm");
           }
