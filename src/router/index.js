@@ -19,7 +19,12 @@ const router = createRouter({
   routes: [
     {
       path: "/login",
-      name: "login",
+      name: "Login",
+      component: LoginView,
+    },
+    {
+      path: "/login/admin",
+      name: "LoginAdmin",
       component: LoginView,
     },
     {
@@ -67,7 +72,12 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const session = useSessionStore();
-  if (to.fullPath !== "/login" && session.token === "") return "/login";
+  if (
+    !["/login", "/login/admin"].includes(to.fullPath) &&
+    session.token === ""
+  ) {
+    return "/login";
+  }
 });
 
 export default router;

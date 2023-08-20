@@ -1,5 +1,6 @@
 <script>
 import { defineComponent } from "vue";
+import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { useSessionStore } from "@/stores/session";
 import { getError } from "@/utils/helpers";
@@ -8,8 +9,10 @@ import resize from "@/components/resize";
 export default defineComponent({
   name: "LoginView",
   setup() {
+    const route = useRoute();
     const session = useSessionStore();
     return {
+      route,
       session,
     };
   },
@@ -19,6 +22,7 @@ export default defineComponent({
       formData: {
         email: "admin@admin.com",
         password: "admin",
+        isLoginAdmin: this.route.path.includes("admin"),
       },
       rules: {
         email: [

@@ -12,10 +12,6 @@ export default defineComponent({
     id: Number,
     readOnly: Boolean,
     screen: Object,
-    user: {
-      type: Object,
-      default: null,
-    },
   },
   setup() {
     const store = useAssignmentStore();
@@ -100,29 +96,30 @@ export default defineComponent({
     },
   },
   mounted() {
+    this.loadUsers();
+    this.loadProduct();
     if (this.id) {
       this.getData();
     } else {
       this.formData = {
-        document_number: '00001',
+        document_number: "00001",
         transaction_date: new Date(),
         is_return: false,
         voided: false,
         details: [],
-      }
+      };
     }
   },
   methods: {
-    async loadUsers(query) {
-      const result = await this.storeUser.findUsers({keyword: query});
-      if (result.error === 0){
+    async loadUsers(query = "") {
+      const result = await this.storeUser.findUsers({ keyword: query });
+      if (result.error === 0) {
         this.users = result.data.data;
       }
     },
-    async loadProduct(query) {
-      const result = await this.storeProduct.findProducts({keyword: query});
-      console.log(query);
-      if (result.error === 0){
+    async loadProduct(query = "") {
+      const result = await this.storeProduct.findProducts({ keyword: query });
+      if (result.error === 0) {
         this.products = result.data.data;
       }
     },
@@ -208,11 +205,16 @@ export default defineComponent({
           v-model="formData.transaction_date"
           type="date"
           placeholder="Fecha asignación"
-          style="width: 100%;"
+          style="width: 100%"
+          :disabled="readOnly || loading"
         />
       </el-form-item>
       <el-form-item prop="is_return">
-        <el-checkbox v-model="formData.is_return" label="Es devolución" />
+        <el-checkbox
+          v-model="formData.is_return"
+          label="Es devolución"
+          :disabled="readOnly || loading"
+        />
       </el-form-item>
       <el-form-item label="Usuario" prop="user_id">
         <el-select
@@ -223,7 +225,7 @@ export default defineComponent({
           :remote-method="loadUsers"
           :loading="storeUser.loading"
           :disabled="readOnly || loading"
-          style="width: 100%;"
+          style="width: 100%"
         >
           <el-option
             v-for="(user, key) in users"
@@ -240,7 +242,7 @@ export default defineComponent({
           </div>
         </template>
         <div>
-          <el-empty v-if="formData.details.length === 0"/>
+          <el-empty v-if="!formData.details || formData.details.length === 0" />
           <el-card
             v-for="(detail, index) in formData.details"
             :key="'detail' + detail.id"
@@ -249,21 +251,27 @@ export default defineComponent({
           >
             <el-row :gutter="20">
               <el-col :sm="24" :md="10" :lg="7">
-                <el-form-item label="Cantidad" :prop="index+'quantity'">
-                  <el-input-number v-model="detail.quantity" size="small" style="width: 100%;" />
+                <el-form-item label="Cantidad">
+                  <el-input
+                    type="number"
+                    v-model="detail.quantity"
+                    size="small"
+                    style="width: 100%"
+                    :disabled="readOnly || loading"
+                  />
                 </el-form-item>
               </el-col>
               <el-col :sm="24" :md="14" :lg="17">
-                <el-form-item label="Producto" :prop="index+'product_id'">
+                <el-form-item label="Producto">
                   <el-select
                     v-model="detail.product_id"
                     placeholder="Seleccione"
                     filterable
                     remote
                     :remote-method="loadProduct"
-                    :loading="storeUser.loading"
+                    :loading="storeProduct.loading"
                     :disabled="readOnly || loading"
-                    style="width: 100%;"
+                    style="width: 100%"
                   >
                     <el-option
                       v-for="(product, key) in products"
@@ -275,23 +283,27 @@ export default defineComponent({
                 </el-form-item>
               </el-col>
               <el-col :sm="24" :md="24">
-                <el-form-item label="Descripción" :prop="index+'description'">
+                <el-form-item label="Descripción">
                   <el-input
                     v-model="detail.description"
                     type="textarea"
                     :autosize="{ minRows: 2, maxRows: 4 }"
                     size="small"
+                    :disabled="readOnly || loading"
                   />
                 </el-form-item>
               </el-col>
-              <el-col :sm="24" :md="24">
+              <el-col :sm="24" :md="24" v-if="!readOnly">
                 <div class="add_line_div">
                   <el-button
                     type="danger"
                     size="small"
                     @click="deleteLine(index)"
                   >
-                    <font-awesome-icon class="button_icon" icon="fa-solid fa-trash" />
+                    <font-awesome-icon
+                      class="button_icon"
+                      icon="fa-solid fa-trash"
+                    />
                   </el-button>
                 </div>
               </el-col>
@@ -299,12 +311,9 @@ export default defineComponent({
           </el-card>
         </div>
         <div class="add_line_div">
-          <el-button
-            type="primary"
-            @click="addLine"
-            v-if="!readOnly"
-          >
-            <font-awesome-icon class="button_icon" icon="fa-solid fa-plus" /> Añadir linea
+          <el-button type="primary" @click="addLine" v-if="!readOnly">
+            <font-awesome-icon class="button_icon" icon="fa-solid fa-plus" />
+            Añadir linea
           </el-button>
         </div>
       </el-card>
@@ -328,7 +337,7 @@ export default defineComponent({
 </template>
 
 <style scoped>
-.add_line_div{
+.add_line_div {
   text-align: right;
 }
 .mobile_card {

@@ -220,7 +220,6 @@ export default defineComponent({
       </el-form-item>
       <el-form-item label="Unidad" prop="visit_unity" v-if="formData.is_visit">
         <el-input
-          type="number"
           v-model="formData.visit_unity"
           autocomplete="off"
           :disabled="readOnly || loading"
